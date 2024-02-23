@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Histórico de Ações</title>
+    <!-- CSS files -->
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler-vendors.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+  </head>
+  <body >
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+	<script src="https://unpkg.com/imask"></script>
+    <div class="page">
+      <!-- Navbar -->
+	  <header class="navbar navbar-expand-md d-print-none" >
+        <div class="container-xl" style="justify-content: right;">
+			<a href="{% url 'logout_page' %}" class="btn btn-primary">Logout</a>
+		</div>
+	  </header>
+      <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+          <div class="container-xl">
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <h2 class="page-title">
+                  Histórico de Ações
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Page body -->
+        <div class="page-body">
+          <div class="container-xl">
+            <div class="row row-cards">
+				{% if messages %}
+				{% for message in messages %}
+				<div class="alert {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+					<h4 class="alert-title">{{ message }}</h4>
+				</div>
+				{% endfor %}
+				{% endif %}
+				<div class="col-12">
+					<div class="container-xl">
+						<a href="{% url 'index' %}" class="btn btn-primary">Voltar</a>
+					</div>
+				</div>
+				<div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <div id="table-default" class="table-responsive">
+						<table class="table">
+						  <thead>
+							<tr>
+							  <th><button class="table-sort" data-sort="sort-1">Ticker</button></th>
+							  <th><button class="table-sort" data-sort="sort-2">Data de Compra</button></th>
+							  <th><button class="table-sort" data-sort="sort-2">Data de Venda</button></th>
+							  <th><button class="table-sort" data-sort="sort-3">Quantidade</button></th>
+							  <th><button class="table-sort" data-sort="sort-4">Valor de Compra</button></th>
+							</tr>
+						  </thead>
+						  <tbody class="table-tbody">
+							{% for e in entries %}
+							<tr>
+							  <td class="sort-1">{{ e.ticker }}</td>
+							  <td class="sort-2" >{{ e.date }}</td>
+							  <td class="sort-2" >{% if e.active %}Ativo{% else %}{{ e.date }}{% endif %}</td>
+							  <td class="sort-3">{{ e.qtd }}</td>
+							  <td class="sort-4">{{ e.price }}</td>
+							</tr>
+							{% endfor %}
+						  </tbody>
+						</table>
+					  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Libs JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.0.2/list.min.js" integrity="sha512-MT5YyrGWqMGkIbwkVUZEWGrRDjlNx8loukEdFyzLo4s8INKVxnDQy2eFcpmnWGrFwJ+X8mRTQOJpWCayXz7+Og==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://unpkg.com/imask"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+		const list = new List('table-default', {
+			sortClass: 'table-sort',
+			listClass: 'table-tbody',
+			valueNames: [ 'sort-name', 'sort-type', 'sort-city', 'sort-score',
+				{ attr: 'data-date', name: 'sort-date' },
+				{ attr: 'data-progress', name: 'sort-progress' },
+				'sort-quantity'
+			]
+		});
+		})
+
+	  </script>
+  </body>
+</html>

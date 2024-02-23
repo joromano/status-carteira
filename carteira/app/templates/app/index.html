@@ -1,0 +1,329 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Carteira de Ações</title>
+    <!-- CSS files -->
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler-vendors.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+  </head>
+  <body >
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+	<script src="https://unpkg.com/imask"></script>
+    <div class="page">
+      <!-- Navbar -->
+	  <header class="navbar navbar-expand-md d-print-none" >
+        <div class="container-xl" style="justify-content: right;">
+			<a href="{% url 'logout_page' %}" class="btn btn-primary">Logout</a>
+		</div>
+	  </header>
+      <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+          <div class="container-xl">
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <h2 class="page-title">
+                  Carteira de Ações
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Page body -->
+        <div class="page-body">
+          <div class="container-xl">
+            <div class="row row-cards">
+				{% if messages %}
+				{% for message in messages %}
+				<div class="alert {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+					<h4 class="alert-title">{{ message }}</h4>
+				</div>
+				{% endfor %}
+				{% endif %}
+				<div class="col-sm-6 col-lg-4">
+					<div class="card">
+					  <div class="card-body">
+						<div class="d-flex align-items-center">
+						  <div class="subheader">Posição Acionária Atual</div>
+						</div>
+						<div class="h1 mb-3">R$ {{ position|floatformat:2 }}</div>
+					  </div>
+					</div>
+				</div>
+				<div class="col-sm-6 col-lg-4">
+					<div class="card">
+					  <div class="card-body">
+						<div class="d-flex align-items-center">
+						  <div class="subheader">Posição da Carteira em Tempo Real</div>
+						</div>
+						<div class="h1 mb-3">R$ {{ current_position|floatformat:2 }}</div>
+						
+					  </div>
+					</div>
+				</div>
+				<div class="col-sm-12 col-lg-4">
+					<div class="card">
+					  <div class="card-body">
+						<div class="d-flex align-items-center">
+						  <div class="subheader">Lucro / Prejuízo</div>
+						</div>
+						<div class="h1 mb-3" style="color: var({% if revenue > 0 %}--tblr-success{% else %}--tblr-danger{% endif %});">{% if revenue > 0 %}+{% else %}-{% endif %} R$ {{ revenue|floatformat:2 }}</div>
+						
+					  </div>
+					</div>
+				</div>
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex">
+                      <h3 class="card-title">Evolução Diária da Carteira - 3 meses</h3>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <div id="chart-active-users-2"></div>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+				<button type="button" class="btn btn-lg btn-success" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#addModal">
+				<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+					Comprar Ação
+				</button>
+              </div>
+			  <!-- MODAL ADD -->
+			  <div class="modal" id="addModal" tabindex="-1">
+				<div class="modal-dialog modal-lg" role="document">
+					<form action="add/" method="post">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h5 class="modal-title">Adicionar Ação</h5>
+					  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+					  <div class="mb-3">
+						<label class="form-label">Ticker</label>
+						<input type="text" class="form-control" name="ticker" placeholder="Ex: PETR4" required/>
+					  </div>
+					  <div class="mb-3">
+						<label class="form-label">Quantidade</label>
+						<input type="number" id="inputQtd" class="form-control" name="qtd" min=0 required/>
+					  </div>
+					  <div class="row">
+						<div class="col-12 col-lg-6">
+						  <div class="mb-3">
+							<label class="form-label">Data da Compra</label>
+							<input type="date" name="date" class="form-control" required/>
+						  </div>
+						</div>
+						<div class="col-12 col-lg-6">
+						  <div class="mb-3">
+							<label class="form-label">Valor</label>
+							<input type="text" class="form-control" id="inputValor" name="price" autocomplete="off" required/>
+							<script>
+								const element = document.getElementById('inputValor');
+								const maskOptions = {
+									mask: Number,  // enable number mask
+
+								// other options are optional with defaults below
+								scale: 2,  // digits after point, 0 for integers
+								thousandsSeparator: '',  // any single char
+								padFractionalZeros: false,  // if true, then pads zeros at end to the length of scale
+								normalizeZeros: true,  // appends or removes zeros at ends
+								radix: ',',  // fractional delimiter
+								mapToRadix: ['.'],  // symbols to process as radix
+								};
+								const mask = IMask(element, maskOptions);
+							</script>
+						  </div>
+						</div>
+					  </div>
+					  <div class="mb-3">
+						Custo total da compra: <strong>R$ <span id="totalCompra"></span></strong>
+					  </div>
+					</div>
+					<div class="modal-footer">
+					  <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+						Cancelar
+					  </a>
+					  <input class="btn btn-primary ms-auto" type="submit" value="Adicionar Ação">
+					</div>
+				</div>
+				{% csrf_token %}
+			</form>
+				</div>
+			  </div>
+			  
+<!-- FIM MODAL			   -->
+			  <div class="col-6">
+				<a href="{% url 'history' %}" class="btn btn-lg btn-info" style="width: 100%;">
+				<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-history" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 8l0 4l2 2" /><path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5" /></svg>
+				Histórico
+				</a>
+              </div>
+			  <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <div id="table-default" class="table-responsive">
+						<table class="table">
+						  <thead>
+							<tr>
+							  <th><button class="table-sort" data-sort="sort-1">Ticker</button></th>
+							  <th><button class="table-sort" data-sort="sort-2">Data de Compra</button></th>
+							  <th><button class="table-sort" data-sort="sort-3">Quantidade</button></th>
+							  <th><button class="table-sort" data-sort="sort-4">Valor de Compra</button></th>
+							  <th><button class="table-sort" data-sort="sort-5">Valor Atual</button></th>
+							  <th><button class="table-sort" data-sort="sort-6">Zerar Posição</button></th>
+							  <th><button class="table-sort" data-sort="sort-6">Apagar Entrada</button></th>
+							</tr>
+						  </thead>
+						  <tbody class="table-tbody">
+							{% for e in entries %}
+							<tr>
+							  <td class="sort-1">{{ e.ticker }}</td>
+							  <td class="sort-2" data-date="1628071164">{{ e.date }}</td>
+							  <td class="sort-3">{{ e.qtd }}</td>
+							  <td class="sort-4">{{ e.price }}</td>
+							  <td class="sort-5">{{ e.current_price }}</td>
+							  <td class="sort-6">
+								<a href="{% url 'remove_entry' e.id %}" class="btn btn-danger btn-icon" aria-label="Zerar Posição">
+									<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+								  </a>
+							  </td>
+							  <td class="sort-6">
+								<a href="{% url 'delete_entry' e.id %}" class="btn btn-outline-danger btn-icon" aria-label="Apagar Entrada">
+									<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+								  </a>
+							  </td>
+							</tr>
+							{% endfor %}
+						  </tbody>
+						</table>
+					  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Libs JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.0.2/list.min.js" integrity="sha512-MT5YyrGWqMGkIbwkVUZEWGrRDjlNx8loukEdFyzLo4s8INKVxnDQy2eFcpmnWGrFwJ+X8mRTQOJpWCayXz7+Og==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://unpkg.com/imask"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+		const list = new List('table-default', {
+			sortClass: 'table-sort',
+			listClass: 'table-tbody',
+			valueNames: [ 'sort-name', 'sort-type', 'sort-city', 'sort-score',
+				{ attr: 'data-date', name: 'sort-date' },
+				{ attr: 'data-progress', name: 'sort-progress' },
+				'sort-quantity'
+			]
+		});
+		})
+
+		$(document).ready(function() {
+		$('#inputQtd, #inputValor').on('input', function() {
+			// Get input values
+			const quantity = parseInt($('#inputQtd').val() || 0); // Handles empty input
+			let value = $('#inputValor').val().replace(/,/g, '.'); // Remove commas
+			value = parseFloat(value) || 0; // Handles empty input
+
+			// Calculate total
+			const total = quantity * value;
+
+			// Format total with commas (optional)
+			const formattedTotal = total.toLocaleString('pt-BR'); 
+
+			// Update the div
+			$('#totalCompra').text(formattedTotal);
+		});
+		});
+	  </script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+      // @formatter:off
+      document.addEventListener("DOMContentLoaded", function () {
+      	window.ApexCharts && (new ApexCharts(document.getElementById('chart-active-users-2'), {
+      		chart: {
+      			type: "line",
+      			fontFamily: 'inherit',
+      			height: 350,
+      			parentHeightOffset: 0,
+      			toolbar: {
+      				show: false,
+      			},
+      			animations: {
+      				enabled: false
+      			},
+      		},
+      		fill: {
+      			opacity: 1,
+      		},
+      		stroke: {
+      			width: 2,
+      			lineCap: "round",
+      			curve: "smooth",
+      		},
+      		series: [{
+      			name: "Acionária",
+      			data: {{ historical_position }}
+      		},{
+      			name: "Real",
+      			data: {{ historical_current_position}}
+      		}],
+      		tooltip: {
+      			theme: 'dark'
+      		},
+      		grid: {
+      			padding: {
+      				top: -20,
+      				right: 0,
+      				left: -4,
+      				bottom: -4
+      			},
+      			strokeDashArray: 4,
+      		},
+      		xaxis: {
+      			labels: {
+      				padding: 0,
+      			},
+      			tooltip: {
+      				enabled: false
+      			},
+      			type: 'datetime',
+      		},
+      		yaxis: {
+      			labels: {
+      				padding: 4
+      			},
+      		},
+      		labels: {{ historical_x|safe }},
+      		colors: [tabler.getColor("green"), tabler.getColor("azure")],
+      		legend: {
+      			show: false,
+      		},
+      	})).render();
+      });
+      // @formatter:on
+    </script>
+  </body>
+</html>
